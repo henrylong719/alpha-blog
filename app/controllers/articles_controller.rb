@@ -2,6 +2,8 @@ class ArticlesController < ApplicationController
   
   # it will run set_article before the listing actions 
   before_action :set_article, only: [:show, :edit, :update, :destroy]
+  before_action :require_user, except: [:show, :index] 
+  before_action :require_same_user, only: [:edit, :update, :destroy]
 
   def show
 
@@ -11,7 +13,7 @@ class ArticlesController < ApplicationController
 
   def index
 
-    @articles = Article.all
+    @articles = Article.paginate(page: params[:page], per_page: 5)
 
   end
  
@@ -36,7 +38,7 @@ class ArticlesController < ApplicationController
     @article = Article.new(article_params)
     # render plain: @article.inspect
 
-    @article.user = User.first
+    @article.user = current_user
 
     if @article.save
     
@@ -54,7 +56,6 @@ class ArticlesController < ApplicationController
 
   def update
     
-
     if @article.update(article_params)
       flash[:notice] = "Article was updated successfully."
       redirect_to @article
@@ -81,5 +82,11 @@ class ArticlesController < ApplicationController
     params.require(:article).permit(:title, :description)
   end
 
-  
+  def require_same_user
+    if current_user != @article.user && !current_user.admin?
+      flash[:alert] = "You can only edit or delete your own article"
+      redirect_to @article
+
+    end
+  end  
 end
