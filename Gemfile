@@ -26,6 +26,9 @@ gem 'will_paginate', '~> 3.1.0'
 
 gem 'rexml', require: false
 
+
+gem 'pg'
+
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 
